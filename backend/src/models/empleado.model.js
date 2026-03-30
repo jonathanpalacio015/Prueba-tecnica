@@ -1,17 +1,20 @@
 const db = require('../db/connection');
 
 const listar = async (filtros = {}) => {
-  let query = 'SELECT * FROM empleados WHERE activo = TRUE';
+  let query = 'SELECT * FROM empleados';
   const values = [];
+  let hasWhere = false;
 
   if (filtros.nombre) {
-    query += ' AND (nombre LIKE ? OR apellido LIKE ?)';
+    query += ' WHERE (nombre LIKE ? OR apellido LIKE ?)';
     values.push(`%${filtros.nombre}%`, `%${filtros.nombre}%`);
+    hasWhere = true;
   }
   
   if (filtros.departamento) {
-    query += ' AND departamento = ?';
+    query += hasWhere ? ' AND departamento = ?' : ' WHERE departamento = ?';
     values.push(filtros.departamento);
+    hasWhere = true;
   }
 
   const limit = parseInt(filtros.limit) || 10;
@@ -66,16 +69,18 @@ const eliminar = async (id) => {
 };
 
 const contar = async (filtros = {}) => {
-  let query = 'SELECT COUNT(*) as total FROM empleados WHERE activo = TRUE';
+  let query = 'SELECT COUNT(*) as total FROM empleados';
   const values = [];
+  let hasWhere = false;
 
   if (filtros.nombre) {
-    query += ' AND (nombre LIKE ? OR apellido LIKE ?)';
+    query += ' WHERE (nombre LIKE ? OR apellido LIKE ?)';
     values.push(`%${filtros.nombre}%`, `%${filtros.nombre}%`);
+    hasWhere = true;
   }
   
   if (filtros.departamento) {
-    query += ' AND departamento = ?';
+    query += hasWhere ? ' AND departamento = ?' : ' WHERE departamento = ?';
     values.push(filtros.departamento);
   }
 
