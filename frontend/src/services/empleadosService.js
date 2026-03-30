@@ -1,4 +1,4 @@
-const BASE = typeof window !== 'undefined' && window.location.hostname === 'localhost' ? 'http://localhost:5000' : '';
+const BASE = typeof window !== 'undefined' ? 'http://backend:5000' : '';
 const API = BASE + '/api/empleados';
 
 async function request(path = '', options = {}) {
