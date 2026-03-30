@@ -21,6 +21,7 @@ function EmpleadosPage() {
       setEmpleados(data || []);
       setTotal(totalData?.total || 0);
     } catch (err) {
+      alert('Error al cargar empleados: ' + err.message);
       console.error('Error fetching:', err);
     }
     setLoading(false);
@@ -35,8 +36,13 @@ function EmpleadosPage() {
   
   const handleDelete = async (id) => {
     if (window.confirm('¿Está seguro de que desea eliminar este empleado?')) {
-      await service.eliminar(id);
-      fetchAll();
+      try {
+        await service.eliminar(id);
+        fetchAll();
+      } catch (err) {
+        alert('Error al eliminar: ' + err.message);
+        console.error('Error deleting:', err);
+      }
     }
   };
   
@@ -48,6 +54,7 @@ function EmpleadosPage() {
       setEditing(null); 
       fetchAll();
     } catch (err) {
+      alert('Error: ' + err.message);
       console.error('Error saving:', err);
     }
   };

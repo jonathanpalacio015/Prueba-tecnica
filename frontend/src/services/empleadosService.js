@@ -5,7 +5,8 @@ async function request(path = '', options = {}) {
   const res = await fetch(API + path, { headers: { 'Content-Type': 'application/json' }, ...options });
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(text || res.statusText);
+    const errorMsg = text ? JSON.parse(text).error || text : res.statusText;
+    throw new Error(errorMsg || `Error ${res.status}`);
   }
   return res.status === 204 ? null : res.json();
 }
