@@ -2,7 +2,7 @@ const Model = require('../models/empleado.model');
 
 const listar = async (req, res) => {
   try {
-    const rows = await Model.listar();
+    const rows = await Model.listar(req.query);
     res.json(rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -49,4 +49,13 @@ const eliminar = async (req, res) => {
   }
 };
 
-module.exports = { listar, obtener, crear, actualizar, eliminar };
+const contar = async (req, res) => {
+  try {
+    const total = await Model.contar(req.query);
+    res.json({ total });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+module.exports = { listar, obtener, crear, actualizar, eliminar, contar };

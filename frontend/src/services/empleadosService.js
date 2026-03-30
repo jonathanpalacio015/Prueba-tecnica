@@ -11,7 +11,20 @@ async function request(path = '', options = {}) {
 }
 
 export default {
-  listar: () => request('/'),
+  listar: (filtros = {}) => {
+    const query = new URLSearchParams();
+    if (filtros.nombre) query.append('nombre', filtros.nombre);
+    if (filtros.departamento) query.append('departamento', filtros.departamento);
+    if (filtros.limit) query.append('limit', filtros.limit);
+    if (filtros.page) query.append('page', filtros.page);
+    return request('/' + (query.toString() ? '?' + query.toString() : ''));
+  },
+  contar: (filtros = {}) => {
+    const query = new URLSearchParams();
+    if (filtros.nombre) query.append('nombre', filtros.nombre);
+    if (filtros.departamento) query.append('departamento', filtros.departamento);
+    return request('/count' + (query.toString() ? '?' + query.toString() : ''));
+  },
   obtener: (id) => request('/' + id),
   crear: (data) => request('/', { method: 'POST', body: JSON.stringify(data) }),
   actualizar: (id, data) => request('/' + id, { method: 'PUT', body: JSON.stringify(data) }),

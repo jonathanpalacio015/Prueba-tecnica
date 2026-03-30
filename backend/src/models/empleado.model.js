@@ -1,7 +1,28 @@
 const db = require('../db/connection');
 
-const listar = async () => {
-  const [rows] = await db.query('SELECT * FROM empleados');
+const listar = async (filtros = {}) => {
+  let query = 'SELECT * FROM empleados WHERE activo = TRUE';
+  const values = [];
+
+  if (filtros.nombre) {
+    query += ' AND (nombre LIKE ? OR apellido LIKE ?)';
+    values.push(`%${filtros.nombre}%`, `%${filtros.nombre}%`);
+  }
+  
+  if (filtros.departamento) {
+    query += ' AND departamento = ?';
+    values.push(filtros.departamento);
+  }
+
+  const limit = parseInt(filtros.limit) || 10;
+  const page = parseInt(filtros.page) || 1;
+  const offset = (page - 1) * limit;
+
+  query += ' LIMIT ? OFFSET ?';
+  values.push(limit, offset);
+
+  const [rows] = await db.query(query, values);
+  
   return rows.map(r => ({
     ...r,
     fecha_ingreso: r.fecha_ingreso ? new Date(r.fecha_ingreso).toISOString().slice(0,10) : null
@@ -40,8 +61,26 @@ const actualizar = async (id, empleado) => {
 };
 
 const eliminar = async (id) => {
-  await db.query('DELETE FROM empleados WHERE id = ?', [id]);
+  await db.query('UPDATE empleados SET activo = FALSE WHERE id = ?', [id]);
   return true;
 };
 
-module.exports = { listar, obtener, crear, actualizar, eliminar };
+const contar = async (filtros = {}) => {
+  let query = 'SELECT COUNT(*) as total FROM empleados WHERE activo = TRUE';
+  const values = [];
+
+  if (filtros.nombre) {
+    query += ' AND (nombre LIKE ? OR apellido LIKE ?)';
+    values.push(`%${filtros.nombre}%`, `%${filtros.nombre}%`);
+  }
+  
+  if (filtros.departamento) {
+    query += ' AND departamento = ?';
+    values.push(filtros.departamento);
+  }
+
+  const [rows] = await db.query(query, values);
+  return rows[0].total;
+};
+
+module.exports = { listar, obtener, crear, actualizar, eliminar, contar };
